@@ -59,7 +59,7 @@ put in /model/yolo.h5
 then launch
 
 """
-
+# test
 colorama.init()
 RED = colorama.Fore.RED
 GREEN = colorama.Fore.GREEN
