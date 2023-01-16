@@ -153,7 +153,7 @@ def name_checker(name):
     else:
         return name
 
-def init_project ():
+def init_project(path):
     try:
         while True:
             print(f"[?]{GRAY}NAME PROJECT:{RESET}")
@@ -165,19 +165,20 @@ def init_project ():
                 
             try:
                 os.mkdir(f"{project_name}")
+                
             except Exception as ex:
-                print(ex)
+                print(f"init_project mkdir:{ex}")
 
             if os.path.exists(f"{project_name}"):
                 print(f"[+]{GREEN}PROJECT {project_name} ALREADY CREATED{RESET}")
-                break
+                return project_name
     except Exception as ex:
         print(ex)
 
 
 def main_parser(path):
 
-    chromedriver_autoinstaller.install()
+    chromedriver_autoinstaller.install() # auto install/update ChromeDriver
 
     global project_name, temp
     li = []
@@ -197,7 +198,7 @@ def main_parser(path):
             result.append(row)
     print(result)
     # create projects
-    project_name = init_project()
+    project_name = init_project(path)
 
 
     useragent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36"
@@ -213,8 +214,8 @@ def main_parser(path):
         driver = webdriver.Chrome(chrome_options=chrome_options)
         print(f"{GREEN}LAUNCH CHROME")
 
-        for ent in result:
-            url = f"{ent}{page_lit}{page_int}"
+        for entered_links in result:
+            url = f"{entered_links}{page_lit}{page_int}"
             driver.get(url)
             time.sleep(1.5)
             cur_link = driver.current_url
@@ -316,33 +317,29 @@ def main_parser(path):
 
                 for index in tqdm(range(0, len(li))):
                     lin = li[index]
+                    marka = f"{project_name}\\{lin.split('/')[6]}"
+                    model = f"{lin.split('/')[7]}__{lin.split('/')[-2]}"
                     try:
-                        if not os.path.exists(f"{project_name}\\{lin.split('/')[6]}"):  # model
-                            os.mkdir(f"{project_name}\\{lin.split('/')[6]}")
-                            if not os.path.exists(
-                                    f"{project_name}\\{lin.split('/')[6]}\\{lin.split('/')[7]}__{lin.split('/')[-2]}"):
-                                os.mkdir(
-                                    f"{project_name}\\{lin.split('/')[6]}\\{lin.split('/')[7]}__{lin.split('/')[-2]}")
+                        if not os.path.exists(f"{marka}"):  # model
+                            os.mkdir(f"{marka}")
+
+                            if not os.path.exists(f"{marka}\\{model}"):
+                                os.mkdir(f"{marka}\\{model}")
                             else:
                                 continue
-                            # https:// auto.ru/ cars/ used/ sale/ bentley/ continental_gt/ 1115616280-929f9ade/
-                            os.mkdir(f"{project_name}\\{lin.split('/')[6]}\\{lin.split('/')[7]}__{lin.split('/')[-2]}")
+                            os.mkdir(f"{marka}\\{model}")
                             print("CREATE")
                             flag = True
                         else:
-                            if not os.path.exists(
-                                    f"{lin.split('/')[6]}\\{lin.split('/')[7]}__{lin.split('/')[-2]}"):
-                                os.mkdir(
-                                    f"{lin.split('/')[6]}\\{lin.split('/')[7]}__{lin.split('/')[-2]}")
+                            if not os.path.exists(f"{marka}\\{model}"):
+                                os.mkdir(f"{marka}\\{model}")
                             else:
                                 continue
                             # https:// auto.ru/ cars/ used/ sale/ bentley/ continental_gt/ 1115616280-929f9ade/
-                            os.mkdir(f"{lin.split('/')[6]}\\{lin.split('/')[7]}__{lin.split('/')[-2]}")
-                            print("CREATE")
-                        """os.mkdir(f"{project_name}/{names[index]}{count}")
-                            flag = False"""
+                            # os.mkdir(f"{lin.split('/')[6]}\\{model}")
+                            # print("CREATE")
                     except Exception as ex:
-                        #print(f"{YELLOW}PATH ALREADY EXIST or {ex}")
+                        print(f"{YELLOW}PATH ALREADY EXIST or {ex}")
                         continue
                     # процесс скачивания
                     finally:
@@ -350,11 +347,11 @@ def main_parser(path):
                             temp = li[index]
                             try:
                                 driver.get(temp)
-                                print(f"{GREEN}LAUNCH CHROME{RESET}")
+                                print(f"{GREEN}[+]GOT LINKS{RESET}")
                             except Exception as ex:
                                 print(ex)
                                 driver.refresh()
-                                print(f"{YELLOW}REFRESH{RESET}")
+                                print(f"{YELLOW}[!]REFRESH{RESET}")
                             print(f"{GREEN}[+]WORK WITH {driver.current_url}{RESET}")
 
                             total_height = int(driver.execute_script("return document.body.scrollHeight") / 4)
@@ -381,14 +378,14 @@ def main_parser(path):
                                     """
                             # if not fl:
                             print(
-                                f"\r{GREEN}[+]HEADERS PARSED LOADING IMG FOR {project_name}\\{lin.split('/')[6]}\\{lin.split('/')[7]}__{lin.split('/')[-2]}")
+                                f"\r{GREEN}[+]HEADERS PARSED LOADING IMG FOR {project_name}\\{lin.split('/')[6]}\\{model}")
                             for imglink in tqdm(webm_links_1200x900n, colour="green"):
                                 try:
                                     data = get_as_base64(imglink)
                                     imgdata = base64.b64decode(data)
                                     filename = f"{imglink.split('/')[-2]}.jpg"
                                     if flag:
-                                        with open(f"{project_name}\\{lin.split('/')[6]}\\{lin.split('/')[7]}__{lin.split('/')[-2]}\\{filename}","wb") as f:
+                                        with open(f"{project_name}\\{lin.split('/')[6]}\\{model}\\{filename}","wb") as f:
                                             f.write(imgdata)
                                     """else:
                                         with open(f"{project_name}/{names[index]}{count}/{filename}", "wb") as f:
@@ -490,6 +487,40 @@ def detect(path_file):
 # nice detection
 # az/11030162 truck 254 126 1303 1019 : 0.63 ; person 684 357 800 453 0.007
 
+def listing_arch():
+    try:
+        images_list = []
+        for project in src_folders:
+            project_path = src_path + "\\" + project
+            if not os.path.exists(output + '\\' + project):
+                os.mkdir(output + '\\' + project)
+            models = os.listdir(project_path)
+            for model in models:
+                try:
+                    if model == "complete.txt" or model == "fetched.txt":
+                        continue
+                    else:
+                        model_path = project_path + '\\' + model
+                        if not os.path.exists(output + '\\' + project + '\\' + model):
+                            os.mkdir(output + '\\' + project + '\\' + model)
+                        print("\t", model_path)
+                        orders = os.listdir(model_path)
+                        for i in orders:
+                            orders_path = project_path + '\\' + model + '\\' + i
+                            if not os.path.exists(output + '\\' + project + '\\' + model + '\\' + i):
+                                os.mkdir(output + '\\' + project + '\\' + model + '\\' + i)
+                            print('\t\t', orders_path)
+                            images = os.listdir(orders_path)
+                            for image in images:
+                                image_path = orders_path + '\\' + image
+                                images_list.append(image_path)
+                                print("\t\t\t", image_path)
+                except Exception as ex:
+                    print(f"{RED}[!]main probably dont get under dir \output\projects\model\:{ex}{RESET}")
+                    time.sleep(5)
+        
+    except Exception as ex:
+        print(ex)
 
 def worker(input_queue, stop_event): #worker for imageai
     while not stop_event.is_set():
@@ -544,18 +575,15 @@ def master(urls):
 if __name__ == "__main__":
     import argparse
 
-
-
     parser = argparse.ArgumentParser(description="Pre-release AVparser v0.3 with Python 3.9.7")
     parser.add_argument("-p", "--parser",  help="Parser avto.ru. recommended format https://link/?year", action="store_true")
     parser.add_argument("-f", "--imageai_filter", help="imageai light filtering image from trash (only cars as possible)", default=80, action="store_true")
     parser.add_argument("-c", "--cpu_cores", help="(SOON)count of usage cpu cores for imageai recommended cpu_count() / 2", default=2, action="store_true")
 
     execution_path = os.getcwd()
-    images_list = []
     src = execution_path + "\\src"
     output = execution_path + "\\output"
-    #detected = execution_path + "\\detect"
+    detected = execution_path + "\\detect"
 
     args = parser.parse_args()
     if args.parser:
@@ -602,37 +630,7 @@ if __name__ == "__main__":
         src_path = execution_path + "\\src"
         src_folders = os.listdir(src_path)
 
-        try:
-            for project in src_folders:
-                project_path = src_path + "\\" + project
-                if not os.path.exists(output + '\\' + project):
-                    os.mkdir(output + '\\' + project)
-                models = os.listdir(project_path)
-                for model in models:
-                    try:
-                        if model == "complete.txt" or model == "fetched.txt":
-                            continue
-                        else:
-                            model_path = project_path + '\\' + model
-                            if not os.path.exists(output + '\\' + project + '\\' + model):
-                                os.mkdir(output + '\\' + project + '\\' + model)
-                            print("\t", model_path)
-                            orders = os.listdir(model_path)
-                            for i in orders:
-                                orders_path = project_path + '\\' + model + '\\' + i
-                                if not os.path.exists(output + '\\' + project + '\\' + model + '\\' + i):
-                                    os.mkdir(output + '\\' + project + '\\' + model + '\\' + i)
-                                print('\t\t', orders_path)
-                                images = os.listdir(orders_path)
-                                for image in images:
-                                    image_path = orders_path + '\\' + image
-                                    images_list.append(image_path)
-                                    print("\t\t\t", image_path)
-                    except Exception as ex:
-                        print(f"{RED}[!]main probably dont get under dir \output\projects\models\:{ex}{RESET}")
-                        time.sleep(5)
-        except Exception as ex:
-            print(ex)
-        master(images_list)
+        
+        master(listing_arch(images_list))
     else:
         print("[?]NO PARAMS: main.py -h")
