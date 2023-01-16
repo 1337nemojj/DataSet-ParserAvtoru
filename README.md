@@ -2,7 +2,7 @@
 
 > images parser for avto.ru and filtering them for dataset. 
 This programm is Kursovaya dont use it for Kursovaya in own case.
-## Installation
+## INSTALLATION:
 ### Prepairing:
 1. ```python -m venv venv```
 2. ```/venv/Scpits/activate.bat``` - for Win 
@@ -22,4 +22,12 @@ link (Download link): ```https://github.com/OlafenwaMoses/ImageAI/releases/downl
 
 put in model in path like this: ```~/model/yolov3.pt```
 
-(not working atm)
+## USAGE:
+1. activate venv
+2. launch ```python main.py -p```
+> choose setup for searching cars on avto.ru in filters
+3. Enter link(s) with "Enter" ex.```https://auto.ru/sankt-peterburg/cars/bmw/all/?year_to=2022&price_from=8000000``` and 2nd "Enter" for confirm
+4. name project
+> it's create new dir with data
+
+## that's launch automated browser and parse images 
