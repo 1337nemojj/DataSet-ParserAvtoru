@@ -17,3 +17,5 @@ https://imageai.readthedocs.io/en/latest/detection/index.html
 link (Download link): ```https://github.com/OlafenwaMoses/ImageAI/releases/download/1.0/yolo.h5/```
 
 put in model in path like this: ```~/model/yolo.h5```
+
+(not working atm)
