@@ -2,6 +2,7 @@ import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 import base64
 import shutil
+import urllib.request
 ############
 import multiprocessing
 import queue
@@ -25,26 +26,45 @@ import wget
 import chromedriver_autoinstaller
 import math
 
+def check_modelyolo():
+    try:
+        if os.path.exists("/model/yolov3.pt"):
+            print("[+] yolov3.pt exist")
+        else:
+            url = "https://github.com/OlafenwaMoses/ImageAI/releases/download/3.0.0-pretrained/yolov3.pt/"
+            destination = os.getcwd()+'/model/yolov3.pt'
+            print("[+] MODEL DOWNLOADING yolo.h5 in model path")
+            tqdm(urllib.request.urlretrieve(url, destination))
+            print("[+] MODEL DOWNLOADED yolo.h5 in model path")
+    except Exception as ex:
+        print("[+] check yolo model source: https://github.com/OlafenwaMoses/ImageAI/releases/download/1.0/yolo.h5/", ex)
+
 #checks
 try:
+    #check_modelyolo()
     execution_path = os.getcwd()
     detector = ObjectDetection()
     detector.setModelTypeAsYOLOv3()
-    detector.setModelPath(os.path.join(execution_path, "model\\yolo.h5"))
+    detector.setModelPath(os.path.join(execution_path, "\\model\\yolov3.pt"))
     print("[+]Loading Model...")
     detector.loadModel()
     print("[+]Model Loaded")
 except:
-    print("!")
+    print("--------")
 """
 [+] NOTES [+]
-
+    OLD VERSION!!!
 installation ImageAi:
 Python3.7.6
 pip install tensorflow==2.4.0
 pip install tensorflow-gpu==2.4.0
 pip install keras==2.4.3 numpy==1.19.3 pillow==7.0.0 scipy==1.4.1 h5py==2.10.0 matplotlib==3.3.2 opencv-python keras-resnet==0.2.0
 pip install imageai --upgrade
+    NEW VERSION
+pip install cython pillow>=7.0.0 numpy>=1.18.1 opencv-python>=4.1.2 torch>=1.9.0 --extra-index-url https://download.pytorch.org/whl/cpu torchvision>=0.10.0 --extra-index-url https://download.pytorch.org/whl/cpu pytest==7.1.3 tqdm==4.64.1 scipy>=1.7.3 matplotlib>=3.4.3 mock==4.0.3
+pip install cython pillow>=7.0.0 numpy>=1.18.1 opencv-python>=4.1.2 torch>=1.9.0 --extra-index-url https://download.pytorch.org/whl/cu102 torchvision>=0.10.0 --extra-index-url https://download.pytorch.org/whl/cu102 pytest==7.1.3 tqdm==4.64.1 scipy>=1.7.3 matplotlib>=3.4.3 mock==4.0.3
+
+
 
 models ImageAi:
 https://imageai.readthedocs.io/en/latest/detection/index.html 
@@ -133,6 +153,27 @@ def name_checker(name):
     else:
         return name
 
+def init_project ():
+    try:
+        while True:
+            print(f"[?]{GRAY}NAME PROJECT:{RESET}")
+            project_name_e = input()
+            project_name = path + "\\" + project_name_e
+            if os.path.exists(f"{project_name}"):
+                print(f"[+]{GREEN}PROJECT {project_name} CREATED{RESET}")
+                return project_name
+                
+            try:
+                os.mkdir(f"{project_name}")
+            except Exception as ex:
+                print(ex)
+
+            if os.path.exists(f"{project_name}"):
+                print(f"[+]{GREEN}PROJECT {project_name} ALREADY CREATED{RESET}")
+                break
+    except Exception as ex:
+        print(ex)
+
 
 def main_parser(path):
 
@@ -156,24 +197,7 @@ def main_parser(path):
             result.append(row)
     print(result)
     # create projects
-    try:
-        while True:
-            print(f"[?]{GRAY}NAME PROJECT:{RESET}")
-            project_name_e = input()
-            project_name = path + "\\" + project_name_e
-            if os.path.exists(f"{project_name}"):
-                print(f"[+]{GREEN}PROJECT {project_name} CREATED{RESET}")
-                break
-            try:
-                os.mkdir(f"{project_name}")
-            except Exception as ex:
-                print(ex)
-
-            if os.path.exists(f"{project_name}"):
-                print(f"[+]{GREEN}PROJECT {project_name} ALREADY CREATED{RESET}")
-                break
-    except Exception as ex:
-        print(ex)
+    project_name = init_project()
 
 
     useragent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36"
@@ -279,7 +303,7 @@ def main_parser(path):
                 finally:
                     li = [i for n, i in enumerate(links_clear) if i not in links_clear[:n]]
                     print(f"{YELLOW}li {len(li)} ; PAGES : {page_int}{RESET}")
-                    # check complete file by duble -> del duble in li from complete
+                    # check complete file by duble -> del duble in li from complete !!!!!!!!!!!!
                     with open(f"{project_name}\\fetched.txt", "w") as s:
                         for i in li:
                             s.write(i + '\n')
@@ -520,16 +544,6 @@ def master(urls):
 if __name__ == "__main__":
     import argparse
 
-
-    try:
-        if os.path.exists("/model/yolo.h5"):
-            print("[+] yolo.h5 exist")
-        else:
-            url = "https://github.com/OlafenwaMoses/ImageAI/releases/download/1.0/yolo.h5/"
-            wget.download(url, "/model/yolo.h5")
-            print("[+] MODEL DOWNLOADED yolo.h5 in model path")
-    except Exception as ex:
-        print("[+] MODEL NOT DOWNLOADED source: https://github.com/OlafenwaMoses/ImageAI/releases/download/1.0/yolo.h5/", ex)
 
 
     parser = argparse.ArgumentParser(description="Pre-release AVparser v0.3 with Python 3.9.7")

@@ -1,1 +1,7 @@
 .venv
+/src
+/model
+/carsize_k0.3
+/detected
+/driver_detected
+/output
