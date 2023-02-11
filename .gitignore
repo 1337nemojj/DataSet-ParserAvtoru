@@ -5,3 +5,6 @@
 /detected
 /driver_detected
 /output
+__pycache__/image_ai.cpython-37.pyc
+__pycache__/net.cpython-37.pyc
+__pycache__/structure.cpython-37.pyc

@@ -346,7 +346,7 @@ def main_parser(path):
 
 def listing_arch():
     try:
-        images_list = []
+        
         for project in src_folders:
             project_path = src_path + "\\" + project
             if not os.path.exists(output + '\\' + project):
@@ -415,8 +415,8 @@ if __name__ == "__main__":
         models = []
         src_path = execution_path + "\\src"
         src_folders = os.listdir(src_path)
-
+        listing_arch()
         
-        image_ai.master(listing_arch(images_list))
+        image_ai.master(images_list)
     else:
         print("[?]NO PARAMS: main.py -h")

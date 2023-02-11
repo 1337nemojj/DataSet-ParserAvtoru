@@ -1,4 +1,5 @@
 import os 
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 import tqdm
 import urllib
 import urllib.request
@@ -32,6 +33,7 @@ try:
 except:
     print("--------")
     
+
 slash = '\\'
 execution_path = os.getcwd()
 src = execution_path + f"{slash}src"
@@ -40,6 +42,56 @@ detected = execution_path + f"{slash}detected{slash}"
 driver_detected = execution_path + f"{slash}driver_detected{slash}"
 car_size_k03 = execution_path + f"{slash}carsize_k0.3{slash}"
 
+
+def detect(path_file):
+    flag = False
+
+    person_count = 0
+    # im = Image.open(path_file)
+    with Image.open(path_file) as im:
+        image_width, image_height = im.size  # let rectangleArea = Math.abs(x1 - x2) * Math.abs(y1 - y2); #square of ddbox
+        sqr = image_height * image_width
+        custom = detector.CustomObjects(person=True, car=True, bus=True, truck=True)
+        temp = execution_path + '\\' + 'detected' + '\\' + path_file.split('\\')[-1]
+        detections = detector.detectObjectsFromImage(
+            custom_objects=custom,
+            input_image=f"{path_file}",
+            extract_detected_objects=False,
+            output_image_path=temp,
+            minimum_percentage_probability=50)
+        for eachObject in detections:
+            x1, y1, x2, y2 = eachObject["box_points"]
+            rectangleArea = math.fabs(x1 - x2) * math.fabs(y1 - y2)
+            k = rectangleArea / sqr
+            print(f"{GREEN}", eachObject["name"], " : ", eachObject["percentage_probability"], " : ",
+                eachObject["box_points"], " : ", k, "size_k", f"{RESET}")
+            if eachObject["name"] == "car" or "bus" or "truck" and "person":
+                if eachObject["name"] == "person":
+                    for detect in detections:
+                        if (detect["name"] == "car" or "bus" or "truck") and (
+                                0.2 < size_k(path_file, detect["box_points"])):
+                            if driver_in(detect["box_points"], eachObject["box_points"]):
+                                print(f"{RED} DRIVER in car's bbox !!!{RESET}")
+                                shutil.copyfile(f"{path_file}", f"{driver_detected}{path_file.split(slash)[-1]}")
+                                flag = True
+                                continue
+
+                person_count += 1
+                if person_count <= 2 and not flag:
+                    flag = True
+                    print(f"{GREEN} <= 2 Persons with car but not sure", eachObject["name"], " : ",
+                        eachObject["percentage_probability"], " : ", eachObject["box_points"], " : ", k, "size_k",
+                        f"{RESET}")
+
+                if k >= 0.3:
+                    shutil.copyfile(f"{path_file}", f"{car_size_k03}{path_file.split(slash)[-1]}")
+
+        print(f"{YELLOW}{path_file}{RESET}")
+        if flag:
+            shutil.copyfile(f"{path_file}", f"{path_file.replace('src', 'output')}")
+            # iterator for driver_detect()
+        
+        print("----------------------------")
 
 def check_modelyolo():
     try:
@@ -55,7 +107,7 @@ def check_modelyolo():
         print("[+] check yolo model source: https://github.com/OlafenwaMoses/ImageAI/releases/download/1.0/yolo.h5/", ex)
 
 
-
+# C:\Users\nemojj\Desktop\DataSet-ParserAvtoru\src\1\mitsubishi\l200__1116132758-a50baaff\1bc7534f7a891600af668878cc9bbbdc.jpg
 def worker(input_queue, stop_event): #worker for imageai
     while not stop_event.is_set():
 
@@ -65,14 +117,14 @@ def worker(input_queue, stop_event): #worker for imageai
         except queue.Empty:
             continue
 
-        #print('Started working on:', url)
+        print('Started working on:', url)
 
         try:
             detect(url)
         except Exception as e:
             print(f"{RED}WORKER: {e}{RESET}")
 
-        #print('Stopped working of:', url)
+        print('Stopped working of:', url)
 
 def master(urls):
     input_queue = multiprocessing.JoinableQueue()
@@ -119,51 +171,3 @@ def size_k(image, bbox_size):
     rectangleArea = math.fabs(x1 - x2) * math.fabs(y1 - y2)
     return rectangleArea/sqr
 
-
-def detect(path_file):
-    flag = False
-
-    person_count = 0
-    im = Image.open(path_file)
-    image_width, image_height = im.size  # let rectangleArea = Math.abs(x1 - x2) * Math.abs(y1 - y2); #square of ddbox
-    sqr = image_height * image_width
-    custom = detector.CustomObjects(person=True, car=True, bus=True, truck=True)
-    temp = execution_path + '\\' + 'detected' + '\\' + path_file.split('\\')[-1]
-    detections = detector.detectObjectsFromImage(
-        custom_objects=custom,
-        input_image=f"{path_file}",
-        extract_detected_objects=False,
-        output_image_path=temp,
-        minimum_percentage_probability=50)
-    for eachObject in detections:
-        x1, y1, x2, y2 = eachObject["box_points"]
-        rectangleArea = math.fabs(x1 - x2) * math.fabs(y1 - y2)
-        k = rectangleArea / sqr
-        print(f"{GREEN}", eachObject["name"], " : ", eachObject["percentage_probability"], " : ",
-              eachObject["box_points"], " : ", k, "size_k", f"{RESET}")
-        if eachObject["name"] == "car" or "bus" or "truck" and "person":
-            if eachObject["name"] == "person":
-                for detect in detections:
-                    if (detect["name"] == "car" or "bus" or "truck") and (
-                            0.2 < size_k(path_file, detect["box_points"])):
-                        if driver_in(detect["box_points"], eachObject["box_points"]):
-                            print(f"{RED} DRIVER in car's bbox !!!{RESET}")
-                            shutil.copyfile(f"{path_file}", f"{driver_detected}{path_file.split(slash)[-1]}")
-                            flag = True
-                            continue
-
-            person_count += 1
-            if person_count <= 2 and not flag:
-                flag = True
-                print(f"{GREEN} <= 2 Persons with car but not sure", eachObject["name"], " : ",
-                      eachObject["percentage_probability"], " : ", eachObject["box_points"], " : ", k, "size_k",
-                      f"{RESET}")
-
-            if k >= 0.3:
-                shutil.copyfile(f"{path_file}", f"{car_size_k03}{path_file.split(slash)[-1]}")
-
-    print(f"{YELLOW}{path_file}{RESET}")
-    if flag:
-        shutil.copyfile(f"{path_file}", f"{path_file.replace('src', 'output')}")
-        # iterator for driver_detect()
-    print("----------------------------")
