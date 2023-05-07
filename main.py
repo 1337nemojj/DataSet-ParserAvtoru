@@ -20,7 +20,7 @@ import chromedriver_autoinstaller
 #=================#
 import structure
 import net
-# import image_ai
+import image_ai
 
 
 
@@ -417,6 +417,6 @@ if __name__ == "__main__":
         src_folders = os.listdir(src_path)
         listing_arch()
         
-        # image_ai.master(images_list)
+        image_ai.master(images_list)
     else:
         print("[?]NO PARAMS: main.py -h")

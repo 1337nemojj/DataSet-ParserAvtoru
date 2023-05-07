@@ -5,8 +5,12 @@ from PIL import Image
 
 net = cv2.dnn.readNet("./model/yolov3.weights", "./model/yolov3.cfg")
 
-classes = ["car", "truck", "bus"]
-image_path = "./src/lexus/lexus/ct__1117283571-88dbf6a9/0c62ce20131882dd128a12393b868446.jpg"
+with open("./model/coco.names", "r") as f:
+    classes = [line.strip() for line in f.readlines()]
+
+
+classes_names = ["car", "truck", "bus"]
+image_path = "./src/lexus/lexus/ct__1118211589-a1829360/78d255cd04d77acfa7d05e1fa28e0562.jpg"
 image = cv2.imread(image_path)
 
 blob = cv2.dnn.blobFromImage(image, 1/255.0, (416, 416), swapRB=True, crop=False)
@@ -30,17 +34,22 @@ for output in layer_outputs:
         scores = detection[5:]
         class_id = np.argmax(scores)
         confidence = scores[class_id]
-        if confidence > 0.7 and classes[class_id] in ["car", "truck", "bus"]:
+        if confidence > 0.7 and classes[class_id] in classes_names:
             
             center_x = int(detection[0] * image.shape[1])
             center_y = int(detection[1] * image.shape[0])
             width = int(detection[2] * image.shape[1])
             height = int(detection[3] * image.shape[0])
-            x = int(center_x - width / 2)
-            y = int(center_y - height / 2)
-            cv2.rectangle(image, (x, y), (x+width, y+height), (0, 255, 0), 2)
-            k = width*height / image.shape[0]*image.shape[1]
-            print(f"confidence {classes[class_id]}\t: {confidence}; {x}:{y}; {width}:{height}; k:{k}"  )
+            x1 = int(center_x - width / 2)
+            y1 = int(center_y - height / 2)
+            x2 = x1 + width
+            y2 = y1 + height
+            bbox = x1,y1,x2,y2
+            k = width*height / image.shape[0]*image.shape[1] 
+            print(f"confidence ~{classes[class_id]}\t: {confidence}; k:{size_k(image_path,bbox)}")
+            if size_k(image_path,bbox) > 0.3:
+                cv2.rectangle(image, (x1, y1), (x1+width, y1+height), (0, 255, 0), 2)
+
 
 cv2.imshow("Object detection", image)
 cv2.waitKey(0)
