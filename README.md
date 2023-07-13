@@ -4,30 +4,36 @@
 This programm is Kursovaya dont use it for Kursovaya in own case.
 ## INSTALLATION:
 ### Prepairing:
-1. ```python -m venv venv```
-2. ```/venv/Scpits/activate.bat``` - for Win 
-3. ```pip install -r requirements.txt```
+*  ```python -m venv venv```
+* ```/venv/Scpits/activate.bat``` - for Win 
+
 ### Requrements for Selenium ```python main.py -p```:
-All requirements should be installed by ```pip install -r requirements.txt``` (but not sure)
-### Requrements for imageai ```python main.py -f``` (not working atm):
- all librares from docs IMAGEAI
+* selenium-wire
+* selenium
+* chromedriver_autoinstaller
+### Requrements openCV + yolov3 ```python main.py -f``` (openCV+yolov3 used instead of imageai):
 
-1. ``` pip install cython pillow>=7.0.0 numpy>=1.18.1 opencv-python>=4.1.2 torch>=1.9.0 --extra-index-url https://download.pytorch.org/whl/cu102 torchvision>=0.10.0 --extra-index-url https://download.pytorch.org/whl/cu102 pytest==7.1.3 tqdm==4.64.1 scipy>=1.7.3 matplotlib>=3.4.3 mock==4.0.3```
-2. ```pip install imageai --upgrade```
 
- model for example in ImageAi docs:
-https://imageai.readthedocs.io/en/latest/detection/index.html 
+put in model's files in path like this: 
 
-link (Download link): ```https://github.com/OlafenwaMoses/ImageAI/releases/download/3.0.0-pretrained/yolov3.pt/```
-
-put in model in path like this: ```~/model/yolov3.pt```
+```~/model/coco.names```
+```~/model/yolov3.cfg```
+```~/model/yolov3.weights```
 
 ## USAGE:
+## Parser only
 1. activate venv
-2. launch ```python main.py -p```
-> choose setup for searching cars on avto.ru in filters
-3. Enter link(s) with "Enter" ex.```https://auto.ru/sankt-peterburg/cars/bmw/all/?year_to=2022&price_from=8000000``` and 2nd "Enter" for confirm
-4. name project
-> it's create new dir with data
+2. launch ```python main.py -p``` -> choose setup for searching cars on avto.ru in filters
 
-## that's launch automated browser and parse images 
+3. enter link(s) with "Enter" ex.```https://auto.ru/sankt-peterburg/cars/bmw/all/?year_to=2022&price_from=8000000``` and press 2nd "Enter" for confirm
+4. name project -> it's create new dir for data
+5. that's launch automated browser and parse images 
+
+## OpenCV filter
+1. launch ```python main.py -f```
+2. all images from path src will be filtered and valid images be copied to ```/ouput/``` path
+
+## Parser + filtering
+
+```python main.py```
+
