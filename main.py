@@ -4,7 +4,6 @@ import base64
 ############
 
 import tqdm
-############
 import colorama
 from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.support.wait import WebDriverWait

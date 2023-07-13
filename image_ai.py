@@ -24,6 +24,9 @@ RESET = colorama.Fore.RESET
 YELLOW = colorama.Fore.YELLOW
 #init colors
 
+with open("./model/coco.names", "r") as f:
+    classes = [line.strip() for line in f.readlines()]
+
 # try:
 #     #check_modelyolo()
 #     execution_path = os.getcwd()
@@ -58,7 +61,7 @@ def size_k(image, bbox_size):
 def detect(image_path):
     
     net = cv2.dnn.readNet("./model/yolov3.weights", "./model/yolov3.cfg")
-    classes = ["car", "truck", "bus"]
+    classes_names = ["car", "truck", "bus"]
     
     image = cv2.imread(image_path)
 
@@ -74,7 +77,7 @@ def detect(image_path):
             scores = detection[5:]
             class_id = np.argmax(scores)
             confidence = scores[class_id]
-            if confidence > 0.7 and classes[class_id] in ["car", "truck", "bus"]:
+            if confidence > 0.7 and classes[class_id] in classes_names:
                 
                 center_x = int(detection[0] * image.shape[1])
                 center_y = int(detection[1] * image.shape[0])
@@ -86,10 +89,11 @@ def detect(image_path):
                 y2 = y1 + height
                 bbox = x1,y1,x2,y2
                 k = width*height / image.shape[0]*image.shape[1] 
-                print(f"confidence ~{classes[class_id]}\t: {confidence}; k:{size_k(image_path,bbox)}")
-                if size_k(image_path,bbox) > 0.3:
+                
+                if 0.7 > size_k(image_path,bbox) > 0.35:
                     # cv2.rectangle(image, (x1, y1), (x1+width, y1+height), (0, 255, 0), 2)
                     shutil.copyfile(f"{image_path}", f"{car_size_k03}{image_path.split(slash)[-1]}")
+                    print(f"confidence\t {image_path} ~{classes[class_id]}\t: {confidence}; k:{size_k(image_path,bbox)}")
                     
 
 

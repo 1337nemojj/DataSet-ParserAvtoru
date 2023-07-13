@@ -10,7 +10,7 @@ with open("./model/coco.names", "r") as f:
 
 
 classes_names = ["car", "truck", "bus"]
-image_path = "./src/lexus/lexus/ct__1118211589-a1829360/78d255cd04d77acfa7d05e1fa28e0562.jpg"
+image_path = "./src/111/lexus/es__1118027496-54dc8b31/1e4a69b58cf25bd353c7abb4c35ca579.jpg"#C:\Users\nemojj\Desktop\DataSet-ParserAvtoru\src\111\lexus\es__1118027496-54dc8b31\1e4a69b58cf25bd353c7abb4c35ca579.jpg
 image = cv2.imread(image_path)
 
 blob = cv2.dnn.blobFromImage(image, 1/255.0, (416, 416), swapRB=True, crop=False)
